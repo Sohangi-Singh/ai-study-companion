@@ -2,8 +2,8 @@
 
 An AI-powered study management system built with React that helps students organize subjects, track progress, plan revisions, and get AI-generated study help.
 
-## 🚀 Live Demo
-[View Live →](your-vercel-link-here)
+## 🌐 Live Demo
+[View Live →] https://ai-study-companion-79d8hjl4u-sohangi-singhs-projects.vercel.app/
 
 ## ✨ Features
 
