@@ -1,15 +1,26 @@
 import { useContext } from "react";
-import { StudyContext } from "../context/StudyContext";
+import { StudyContext } from "../context/StudyContextObject";
 import useProgress from "../hooks/useProgress";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { COLORS } from "../utils/helpers";
 import { Link } from "react-router-dom";
+import {
+  FiAlertTriangle,
+  FiBarChart2,
+  FiBookOpen,
+  FiCheckSquare,
+  FiClock,
+  FiList,
+  FiRefreshCw,
+  FiTarget,
+  FiTrendingUp,
+} from "react-icons/fi";
 
 function Dashboard() {
-  const { subjects, tasks, studySessions } = useContext(StudyContext);
+  const { subjects } = useContext(StudyContext);
   const {
     totalTopics, completedTopics, needsRevision,
-    totalTasks, completedTasks, pendingTasks, overdueTasks,
+    totalTasks, pendingTasks, overdueTasks,
     completionPercent, subjectProgress,
     bestDay, sessionsThisWeek
   } = useProgress();
@@ -48,26 +59,32 @@ function Dashboard() {
   return (
     <div>
       <div className="page-header">
-        <h1>📊 Dashboard</h1>
+        <h1 className="page-title">
+          <FiBarChart2 className="page-title-icon" aria-hidden="true" />
+          <span className="page-title-text">Dashboard</span>
+        </h1>
         <p>Your study progress at a glance</p>
       </div>
 
       {/* Stat Cards */}
       <div className="stat-grid">
         {[
-          { label: "Total Topics", value: totalTopics, icon: "📚" },
-          { label: "Completed", value: completedTopics, icon: "✅" },
-          { label: "Needs Revision", value: needsRevision, icon: "🔁" },
-          { label: "Total Tasks", value: totalTasks, icon: "📝" },
-          { label: "Pending Tasks", value: pendingTasks, icon: "⏳" },
-          { label: "Overdue", value: overdueTasks, icon: "⚠️" },
-        ].map((s) => (
-          <div className="stat-card" key={s.label}>
-            <div style={{ fontSize: "1.8rem" }}>{s.icon}</div>
-            <div className="stat-number">{s.value}</div>
-            <div className="stat-label">{s.label}</div>
-          </div>
-        ))}
+          { label: "Total Topics", value: totalTopics, icon: FiBookOpen },
+          { label: "Completed", value: completedTopics, icon: FiCheckSquare },
+          { label: "Needs Revision", value: needsRevision, icon: FiRefreshCw },
+          { label: "Total Tasks", value: totalTasks, icon: FiList },
+          { label: "Pending Tasks", value: pendingTasks, icon: FiClock },
+          { label: "Overdue", value: overdueTasks, icon: FiAlertTriangle },
+        ].map((s) => {
+          const Icon = s.icon;
+          return (
+            <div className="stat-card" key={s.label}>
+              <Icon className="stat-icon" aria-hidden="true" />
+              <div className="stat-number">{s.value}</div>
+              <div className="stat-label">{s.label}</div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Overall Progress */}
@@ -84,7 +101,10 @@ function Dashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         {/* Subject Progress Chart */}
         <div className="card">
-          <h3 style={{ marginBottom: 16 }}>📊 Subject Progress</h3>
+          <h3 className="section-title">
+            <FiBarChart2 className="section-title-icon" aria-hidden="true" />
+            <span>Subject Progress</span>
+          </h3>
           {subjectProgress.length === 0 ? (
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No subjects yet.</p>
           ) : (
@@ -108,7 +128,10 @@ function Dashboard() {
 
         {/* Productivity Insights */}
         <div className="card">
-          <h3 style={{ marginBottom: 16 }}>💡 Productivity Insights</h3>
+          <h3 className="section-title">
+            <FiTrendingUp className="section-title-icon" aria-hidden="true" />
+            <span>Productivity Insights</span>
+          </h3>
           {insights.map((ins, i) => (
             <div className="insight" key={i}>
               <span className="insight-icon">{ins.icon}</span>
@@ -124,7 +147,10 @@ function Dashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         {/* Weak Topics */}
         <div className="card">
-          <h3 style={{ marginBottom: 16 }}>⚠️ Weak Topics</h3>
+          <h3 className="section-title">
+            <FiTarget className="section-title-icon" aria-hidden="true" />
+            <span>Weak Topics</span>
+          </h3>
           {weakTopics.length === 0 ? (
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No weak topics detected. Great job! 🎉</p>
           ) : (
@@ -150,7 +176,10 @@ function Dashboard() {
 
         {/* Revision Due Soon */}
         <div className="card">
-          <h3 style={{ marginBottom: 16 }}>🔁 Revision Due Soon</h3>
+          <h3 className="section-title">
+            <FiRefreshCw className="section-title-icon" aria-hidden="true" />
+            <span>Revision Due Soon</span>
+          </h3>
           {revisionDue.length === 0 ? (
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No revisions due soon.</p>
           ) : (

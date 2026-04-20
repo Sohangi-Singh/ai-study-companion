@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { StudyContext } from "../context/StudyContext";
-import { format, parseISO, startOfWeek, isWithinInterval, endOfWeek } from "date-fns";
+import { StudyContext } from "../context/StudyContextObject";
+import { parseISO, startOfWeek, isWithinInterval, endOfWeek } from "date-fns";
 
 function useProgress() {
   const { subjects, tasks, studySessions } = useContext(StudyContext);

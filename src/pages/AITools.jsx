@@ -1,13 +1,15 @@
 import { useState, useContext } from "react";
-import { StudyContext } from "../context/StudyContext";
+import { StudyContext } from "../context/StudyContextObject";
 import { generateAI } from "../services/aiService";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiCopy, FiCpu, FiCreditCard, FiHelpCircle, FiRefreshCw, FiZap } from "react-icons/fi";
 
+const MotionDiv = motion.div;
 const MODES = [
-  { key: "quiz", label: "🧠 Quiz Me", desc: "Generate 5 MCQs on a topic" },
-  { key: "explain", label: "💡 Explain Simply", desc: "Explain like I'm a beginner" },
-  { key: "flashcards", label: "🃏 Flashcards", desc: "Key points as flashcards" },
+  { key: "quiz", label: "Quiz Me", desc: "Generate 5 MCQs on a topic", icon: FiHelpCircle },
+  { key: "explain", label: "Explain Simply", desc: "Explain like I'm a beginner", icon: FiZap },
+  { key: "flashcards", label: "Flashcards", desc: "Key points as flashcards", icon: FiCreditCard },
 ];
 
 function AITools() {
@@ -16,6 +18,7 @@ function AITools() {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [mode, setMode] = useState("quiz");
   const [result, setResult] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [savedTopics, setSavedTopics] = useState([]);
 
@@ -31,6 +34,7 @@ function AITools() {
     try {
       setLoading(true);
       setResult("");
+      setError("");
       let res;
       if (mode === "quiz") {
         res = await generateAI("", { mode: "quiz", topic });
@@ -41,7 +45,9 @@ function AITools() {
       if (selectedSubject) logSession(selectedSubject);
       toast.success("Generated successfully!");
     } catch (err) {
-      toast.error("Failed. Check API key or try again.");
+      const message = err?.message || "AI generation failed. Check your Gemini API key and try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -107,7 +113,7 @@ function AITools() {
         const jsonString = result.slice(jsonStart, jsonEnd + 1);
         quizQuestions = JSON.parse(jsonString);
       }
-    } catch (e) {
+  } catch {
       // fallback: show error or nothing
       quizQuestions = [];
     }
@@ -147,28 +153,37 @@ function AITools() {
   return (
     <div>
       <div className="page-header">
-        <h1>🤖 AI Study Tools</h1>
+        <h1 className="page-title">
+          <FiCpu className="page-title-icon" aria-hidden="true" />
+          <span className="page-title-text">AI Study Tools</span>
+        </h1>
         <p>Powered by Gemini AI — your personal study assistant</p>
       </div>
 
       {/* Mode Selector */}
       <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
-        {MODES.map((m) => (
-          <div
-            key={m.key}
-            onClick={() => { setMode(m.key); setResult(""); }}
-            style={{
-              flex: 1, minWidth: 160, padding: "14px 16px", borderRadius: 12, cursor: "pointer",
-              background: mode === m.key ? "var(--primary)" : "var(--surface)",
-              color: mode === m.key ? "white" : "var(--text)",
-              border: `1px solid ${mode === m.key ? "var(--primary)" : "var(--border)"}`,
-              transition: "all 0.2s"
-            }}
-          >
-            <div style={{ fontWeight: 600 }}>{m.label}</div>
-            <div style={{ fontSize: "0.78rem", opacity: 0.8, marginTop: 4 }}>{m.desc}</div>
-          </div>
-        ))}
+        {MODES.map((m) => {
+          const Icon = m.icon;
+          return (
+            <div
+              key={m.key}
+              onClick={() => { setMode(m.key); setResult(""); setError(""); }}
+              style={{
+                flex: 1, minWidth: 160, padding: "14px 16px", borderRadius: 12, cursor: "pointer",
+                background: mode === m.key ? "var(--primary)" : "var(--surface)",
+                color: mode === m.key ? "white" : "var(--text)",
+                border: `1px solid ${mode === m.key ? "var(--primary)" : "var(--border)"}`,
+                transition: "all 0.2s"
+              }}
+            >
+              <div className="ai-mode-title">
+                <Icon className="ai-mode-icon" aria-hidden="true" />
+                <span>{m.label}</span>
+              </div>
+              <div style={{ fontSize: "0.78rem", opacity: 0.8, marginTop: 4 }}>{m.desc}</div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Input */}
@@ -205,19 +220,33 @@ function AITools() {
       {/* Loading */}
       {loading && (
         <div className="card" style={{ textAlign: "center", padding: 40 }}>
-          <div style={{ fontSize: "2rem", marginBottom: 12 }}>🤖</div>
+          <FiCpu className="loading-ai-icon" aria-hidden="true" />
           <p style={{ color: "var(--text-muted)" }}>AI is thinking...</p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className="card ai-error" style={{ marginBottom: 24 }}>
+          <h3 className="section-title section-title-compact">
+            <FiCpu className="section-title-icon" aria-hidden="true" />
+            <span>AI Setup Needs Attention</span>
+          </h3>
+          <p>{error}</p>
+          <p className="ai-error-help">Use a valid `VITE_GEMINI_API_KEY` in `.env`, then restart the Vite dev server so the browser receives the new value.</p>
         </div>
       )}
 
       {/* Result */}
       <AnimatePresence>
         {result && !loading && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             {/* Flashcard mode — special UI */}
             {mode === "flashcards" && flashcards.length > 0 ? (
               <div>
-                <h3 style={{ marginBottom: 16 }}>🃏 Flashcards — click to flip</h3>
+                <h3 className="section-title">
+                  <FiCreditCard className="section-title-icon" aria-hidden="true" />
+                  <span>Flashcards — click to flip</span>
+                </h3>
                 <div className="card-grid">
                   {flashcards.map((card, i) => (
                     <div
@@ -239,7 +268,10 @@ function AITools() {
               </div>
             ) : mode === "quiz" && quizQuestions.length > 0 ? (
               <div className="card">
-                <h3 style={{ marginBottom: 16 }}>🧠 Interactive Quiz</h3>
+                <h3 className="section-title">
+                  <FiHelpCircle className="section-title-icon" aria-hidden="true" />
+                  <span>Interactive Quiz</span>
+                </h3>
                 {quizState.showResult ? (
                   <div>
                     <div style={{ marginBottom: 16, fontWeight: 600 }}>
@@ -328,11 +360,16 @@ function AITools() {
             ) : mode === "explain" && result ? (
               <div className="card">
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                  <h3>💡 Simple Explanation</h3>
+                  <h3 className="section-title section-title-compact">
+                    <FiZap className="section-title-icon" aria-hidden="true" />
+                    <span>Simple Explanation</span>
+                  </h3>
                   <button className="btn btn-outline btn-sm" onClick={() => {
                     navigator.clipboard.writeText(result);
                     toast.success("Copied!");
-                  }}>📋 Copy</button>
+                  }}>
+                    <FiCopy aria-hidden="true" /> Copy
+                  </button>
                 </div>
                 {/* Try to format Gemini's output: split into paragraphs and bullets if possible */}
                 <div style={{ lineHeight: 1.7, fontSize: "0.98rem", color: "var(--text)", fontFamily: "inherit" }}>
@@ -393,11 +430,20 @@ function AITools() {
             ) : (
               <div className="card">
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                  <h3>{mode === "quiz" ? "🧠 Quiz Questions" : "💡 Simple Explanation"}</h3>
+                  <h3 className="section-title section-title-compact">
+                    {mode === "quiz" ? (
+                      <FiHelpCircle className="section-title-icon" aria-hidden="true" />
+                    ) : (
+                      <FiZap className="section-title-icon" aria-hidden="true" />
+                    )}
+                    <span>{mode === "quiz" ? "Quiz Questions" : "Simple Explanation"}</span>
+                  </h3>
                   <button className="btn btn-outline btn-sm" onClick={() => {
                     navigator.clipboard.writeText(result);
                     toast.success("Copied!");
-                  }}>📋 Copy</button>
+                  }}>
+                    <FiCopy aria-hidden="true" /> Copy
+                  </button>
                 </div>
                 <pre style={{
                   whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: "0.9rem",
@@ -407,14 +453,17 @@ function AITools() {
                 </pre>
               </div>
             )}
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
 
       {/* Saved for revision */}
       {savedTopics.length > 0 && (
         <div className="card" style={{ marginTop: 24 }}>
-          <h3 style={{ marginBottom: 12 }}>🔁 Saved for Later Review</h3>
+          <h3 className="section-title">
+            <FiRefreshCw className="section-title-icon" aria-hidden="true" />
+            <span>Saved for Later Review</span>
+          </h3>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {savedTopics.map((t) => (
               <span key={t} className="badge badge-purple">{t}</span>

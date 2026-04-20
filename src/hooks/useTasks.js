@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { StudyContext } from "../context/StudyContext";
+import { StudyContext } from "../context/StudyContextObject";
 import { toast } from "react-toastify";
 import { isPast, parseISO } from "date-fns";
 

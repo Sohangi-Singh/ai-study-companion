@@ -2,9 +2,11 @@ import { useState } from "react";
 import useTasks from "../hooks/useTasks";
 import useSubjects from "../hooks/useSubjects";
 import useDebounce from "../hooks/useDebounce";
-import { formatDate, daysUntil, priorityColor } from "../utils/helpers";
+import { daysUntil, priorityColor } from "../utils/helpers";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiCheckSquare, FiPlusCircle } from "react-icons/fi";
 
+const MotionDiv = motion.div;
 const TABS = ["All", "Pending", "Completed", "Overdue", "Revision"];
 const PRIORITIES = ["Low", "Medium", "High"];
 
@@ -59,7 +61,10 @@ function Tasks() {
     <div>
       <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <h1>✅ Tasks</h1>
+          <h1 className="page-title">
+            <FiCheckSquare className="page-title-icon" aria-hidden="true" />
+            <span className="page-title-text">Tasks</span>
+          </h1>
           <p>Create and manage your study tasks</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>+ Add Task</button>
@@ -68,10 +73,13 @@ function Tasks() {
       {/* Add Task Form */}
       <AnimatePresence>
         {showForm && (
-          <motion.div className="card" style={{ marginBottom: 24 }}
+          <MotionDiv className="card" style={{ marginBottom: 24 }}
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
           >
-            <h3 style={{ marginBottom: 16 }}>New Task</h3>
+            <h3 className="section-title">
+              <FiPlusCircle className="section-title-icon" aria-hidden="true" />
+              <span>New Task</span>
+            </h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <input className="input" style={{ gridColumn: "1/-1" }} placeholder="Task title *"
                 value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -100,7 +108,7 @@ function Tasks() {
               <button className="btn btn-primary" onClick={handleAdd}>Add Task</button>
               <button className="btn btn-outline" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
 
@@ -149,7 +157,7 @@ function Tasks() {
             {filtered.map((task) => {
               const days = daysUntil(task.deadline);
               return (
-                <motion.div key={task.id} className="card"
+                <MotionDiv key={task.id} className="card"
                   style={{ borderLeft: `4px solid ${task.isOverdue ? "var(--danger)" : task.priority === "High" ? "#f59e0b" : "var(--primary)"}` }}
                   initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
                   layout
@@ -184,7 +192,7 @@ function Tasks() {
                       <button className="btn btn-danger btn-sm" onClick={() => deleteTask(task.id)}>🗑️</button>
                     </div>
                   </div>
-                </motion.div>
+                </MotionDiv>
               );
             })}
           </AnimatePresence>

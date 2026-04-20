@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
 import useSubjects from "../hooks/useSubjects";
 import { statusColor } from "../utils/helpers";
+import { FiBookOpen, FiPlusCircle } from "react-icons/fi";
 
+const MotionDiv = motion.div;
 const COLORS = ["#6366f1","#06b6d4","#22c55e","#f59e0b","#ef4444","#8b5cf6","#ec4899"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const STATUSES = ["Not Started", "In Progress", "Completed", "Needs Revision"];
@@ -41,7 +42,10 @@ function Subjects() {
       {/* Header */}
       <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <h1>📚 Subjects</h1>
+          <h1 className="page-title">
+            <FiBookOpen className="page-title-icon" aria-hidden="true" />
+            <span className="page-title-text">Subjects</span>
+          </h1>
           <p>Manage your subjects and topics</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowSubForm(!showSubForm)}>
@@ -52,14 +56,17 @@ function Subjects() {
       {/* Add Subject Form */}
       <AnimatePresence>
         {showSubForm && (
-          <motion.div
+          <MotionDiv
             className="card"
             style={{ marginBottom: 24 }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            <h3 style={{ marginBottom: 16 }}>New Subject</h3>
+            <h3 className="section-title">
+              <FiPlusCircle className="section-title-icon" aria-hidden="true" />
+              <span>New Subject</span>
+            </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <input
                 className="input"
@@ -93,7 +100,7 @@ function Subjects() {
                 <button className="btn btn-outline" onClick={() => setShowSubForm(false)}>Cancel</button>
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
 
@@ -114,7 +121,7 @@ function Subjects() {
           const tf = getTopicForm(subject.id);
 
           return (
-            <motion.div
+            <MotionDiv
               key={subject.id}
               className="card"
               layout
@@ -158,7 +165,7 @@ function Subjects() {
               {/* Topics Section */}
               <AnimatePresence>
                 {isOpen && (
-                  <motion.div
+                  <MotionDiv
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
@@ -242,10 +249,10 @@ function Subjects() {
                         </div>
                       )}
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </MotionDiv>
           );
         })}
       </div>
