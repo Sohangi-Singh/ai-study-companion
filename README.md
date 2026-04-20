@@ -2,9 +2,6 @@
 
 > Your personal AI-powered study management system — organize smarter, revise better, and study with the power of AI.
 
-## 🌐 Live Demo
-View Live → https://ai-study-companion-79d8hjl4u-sohangi-singhs-projects.vercel.app/
-
 ---
 
 ## 📖 What is AI Study Companion?
